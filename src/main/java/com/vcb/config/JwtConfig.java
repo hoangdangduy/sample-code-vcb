@@ -1,4 +1,4 @@
-package com.demo.config;
+package com.vcb.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,18 +11,10 @@ import org.springframework.security.oauth2.jwt.*;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Cấu hình Multi-Tenant JWT Decoder:
- * - IAM  (Keycloak) → nhân viên nội bộ
- * - CIAM (Auth0)    → khách hàng
- *
- * Cách hoạt động: Dựa vào claim "iss" (issuer) trong JWT token
- * để xác định token đến từ hệ thống nào, rồi dùng đúng JWK để verify.
- */
 @Configuration
-public class MultiTenantJwtConfig {
+public class JwtConfig {
 
-    private static final Logger log = LoggerFactory.getLogger(MultiTenantJwtConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(JwtConfig.class);
 
     @Value("${app.security.iam.issuer-uri}")
     private String iamIssuerUri;
@@ -46,9 +38,9 @@ public class MultiTenantJwtConfig {
 
         if (issuer.contains(iamIssuerUri) || iamIssuerUri.contains(issuer)) {
             jwkSetUri = iamJwkSetUri;
-            log.info("🔐 [IAM] Sử dụng Keycloak decoder cho issuer: {}", issuer);
+            log.info("🔐 [IAM] Use Keycloak decoder for issuer: {}", issuer);
         } else {
-            throw new JwtException("❌ Issuer không được tin tưởng: " + issuer);
+            throw new JwtException("❌ Issuer not trust: " + issuer);
         }
 
         NimbusJwtDecoder decoder = NimbusJwtDecoder
@@ -65,18 +57,18 @@ public class MultiTenantJwtConfig {
         try {
             String[] parts = token.split("\\.");
             if (parts.length < 2) {
-                throw new JwtException("JWT không hợp lệ: thiếu phần payload");
+                throw new JwtException("Invalid JWT: missing payload");
             }
             String payload = new String(java.util.Base64.getUrlDecoder().decode(parts[1]));
             com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
             Map<?, ?> claims = mapper.readValue(payload, Map.class);
             Object iss = claims.get("iss");
             if (iss == null) {
-                throw new JwtException("JWT không có claim 'iss'");
+                throw new JwtException("JWT don't have claim 'iss'");
             }
             return iss.toString();
         } catch (Exception e) {
-            throw new JwtException("Không thể đọc issuer từ JWT: " + e.getMessage());
+            throw new JwtException("Can't read issuer from JWT: " + e.getMessage());
         }
     }
 }

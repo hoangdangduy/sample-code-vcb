@@ -1,4 +1,4 @@
-package com.demo.config;
+package com.vcb.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,9 +19,9 @@ import java.util.stream.Collectors;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    private final MultiTenantJwtConfig multiTenantJwtConfig;
+    private final JwtConfig multiTenantJwtConfig;
 
-    public SecurityConfig(MultiTenantJwtConfig multiTenantJwtConfig) {
+    public SecurityConfig(JwtConfig multiTenantJwtConfig) {
         this.multiTenantJwtConfig = multiTenantJwtConfig;
     }
 
@@ -33,11 +33,8 @@ public class SecurityConfig {
             .sessionManagement(session ->
                 session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/public/**").permitAll()
                 .requestMatchers("/actuator/health").permitAll()
-                .requestMatchers("/api/customer/products").permitAll()
-                .requestMatchers("/api/employee/**").hasRole("EMPLOYEE")
-                .requestMatchers("/api/customer/**").hasRole("CUSTOMER")
+                .requestMatchers("/api/employee/**").hasAnyRole("EMPLOYEE", "ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )

@@ -33,10 +33,10 @@ services:
       KC_BOOTSTRAP_ADMIN_USERNAME: admin
       KC_BOOTSTRAP_ADMIN_PASSWORD: admin
       # Dùng PostgreSQL làm database backend (thay vì H2 in-memory)
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
-      KC_DB_USERNAME: sampletest1
-      KC_DB_PASSWORD: sampletest1
+      KC_DB: dev-file
+#      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
+#      KC_DB_USERNAME: sampletest1
+#      KC_DB_PASSWORD: sampletest1
     ports:
       - "127.0.0.1:8180:8080"
     volumes:

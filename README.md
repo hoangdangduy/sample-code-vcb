@@ -151,8 +151,8 @@ mvn spring-boot:run
 ### IAM Token (Keycloak)
 
 ```bash
-chmod +x get-iam-token.sh
-./get-iam-token.sh
+chmod +x get-iam-employee-token.sh
+./get-iam-employee-token.sh
 ```
 
 Hoặc thủ công:
