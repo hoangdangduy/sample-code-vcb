@@ -1,0 +1,51 @@
+version: '3.8'
+services:
+
+  # ──────────────────────────────────────────────────────────────
+  # PostgreSQL 17 (latest stable)
+  # ──────────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:17
+    container_name: postgres-vcb
+    environment:
+      POSTGRES_DB: postgres           # tên database mặc định
+      POSTGRES_USER: sampletest1      # username
+      POSTGRES_PASSWORD: sampletest1  # password
+    command: ["postgres", "-c", "ssl=off"]  # tắt SSL, cho phép kết nối không mã hóa
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sampletest1 -d postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ──────────────────────────────────────────────────────────────
+  # Keycloak 26.5.5
+  # ──────────────────────────────────────────────────────────────
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.5.5
+    container_name: keycloak-vcb
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      # Dùng PostgreSQL làm database backend (thay vì H2 in-memory)
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
+      KC_DB_USERNAME: sampletest1
+      KC_DB_PASSWORD: sampletest1
+    ports:
+      - "127.0.0.1:8180:8080"
+    volumes:
+      - ./keycloak-import:/opt/keycloak/data/import   # realm JSON sẽ được auto-import khi start
+    command: start-dev --import-realm                  # tự động import nếu realm chưa tồn tại
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: always
+
+volumes:
+  postgres-data:

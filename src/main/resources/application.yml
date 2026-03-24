@@ -1,0 +1,34 @@
+server:
+  port: 8080
+
+spring:
+#  security:
+#    oauth2:
+#      resourceserver:
+#        jwt:
+#          issuer-uri: http://localhost:8180/realms/company-realm
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: sampletest1
+    password: sampletest1
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+    hibernate:
+      ddl-auto: none   # bảng đã tạo sẵn qua SQL scripts, Hibernate không tự tạo/xóa
+    properties:
+      hibernate:
+        format_sql: true
+
+app:
+  security:
+    iam:
+      issuer-uri: http://localhost:8180/realms/company-realm
+      jwk-set-uri: http://localhost:8180/realms/company-realm/protocol/openid-connect/certs
+
+logging:
+  level:
+    org.springframework.security: DEBUG

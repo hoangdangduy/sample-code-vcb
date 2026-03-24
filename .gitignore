@@ -1,3 +1,6 @@
+# Force track .idea folder
+*.idea/
+target
 # Compiled class file
 *.class
 
