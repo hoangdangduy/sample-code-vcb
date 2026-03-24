@@ -1,3 +1,5 @@
+create sequence if not exists customer_id_seq;
+
 create table IF NOT EXISTS employee
 (
     id         integer default nextval('customer_id_seq'::regclass) not null
