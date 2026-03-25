@@ -1,8 +1,16 @@
-## Build và chạy ứng dụng
+## 🏃‍♂️Build và chạy ứng dụng
 
 ```bash
 mvn spring-boot:run
 ```
+
+## 🥷🏼 Danh sách User
+
+| User   | Role       |
+|--------|------------|
+| hungtm    | `ADMIN`    |
+| tientn   | `EMPLOYEE` |
+
 
 ## 📋 Danh sách Endpoints
 

@@ -1,5 +1,6 @@
 package com.vcb.aspect;
 
+import com.vcb.utils.StringUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.lang.reflect.Parameter;
@@ -26,16 +27,20 @@ public class ControllerLoggingAspect {
     @Pointcut("within(@org.springframework.web.bind.annotation.RestController *)")
     public void restControllerPointcut() {}
 
+    @Pointcut("within(@org.springframework.stereotype.Service *)")
+    public void servicePointcut() {}
+
+
     @Around("restControllerPointcut()")
-    public Object logAround(ProceedingJoinPoint joinPoint) throws Throwable {
+    public Object logAroundController(ProceedingJoinPoint joinPoint) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes)
                 RequestContextHolder.currentRequestAttributes()).getRequest();
 
         String controllerName = joinPoint.getTarget().getClass().getSimpleName();
         String methodName     = joinPoint.getSignature().getName();
-        String paramLog       = buildParamLog(joinPoint);
+        String paramLog       = buildParamControllerLog(joinPoint);
 
-        log.info("[API] --> {} {} | {}.{}(){}",
+        log.info("[Controller] --> {} {} | {}.{}(){}",
                 request.getMethod(), request.getRequestURI(), controllerName, methodName, paramLog);
 
         long start = System.currentTimeMillis();
@@ -44,16 +49,16 @@ public class ControllerLoggingAspect {
             long   elapsed = System.currentTimeMillis() - start;
             String status  = (result instanceof ResponseEntity<?> re)
                     ? re.getStatusCode().toString() : "OK";
-            log.info("[API] <-- {} | {}ms", status, elapsed);
+            log.info("[Controller] <-- {} | {}ms", status, elapsed);
             return result;
         } catch (Exception e) {
-            log.error("[API] <-- ERROR {} | {}ms | {}",
+            log.error("[Controller] <-- ERROR {} | {}ms | {}",
                     e.getClass().getSimpleName(), System.currentTimeMillis() - start, e.getMessage());
             throw e;
         }
     }
 
-    private String buildParamLog(ProceedingJoinPoint joinPoint) {
+    private String buildParamControllerLog(ProceedingJoinPoint joinPoint) {
         Parameter[] parameters = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameters();
         Object[]    args       = joinPoint.getArgs();
         StringBuilder sb       = new StringBuilder();
@@ -73,13 +78,42 @@ public class ControllerLoggingAspect {
             sb.append(String.format("%n  @PathVariable [%s] = %s", name, arg));
         } else if (param.isAnnotationPresent(RequestParam.class)) {
             String name = resolveParamName(param.getAnnotation(RequestParam.class).value(), param.getName());
-            sb.append(String.format("%n  @RequestParam  [%s] = %s", name, arg));
+            sb.append(String.format("%n  @RequestParam  [%s] = %s", name, StringUtils.convertString(arg)));
         } else if (param.isAnnotationPresent(RequestBody.class)) {
-            sb.append(String.format("%n  @RequestBody   = %s", arg));
+            sb.append(String.format("%n  @RequestBody   = %s", StringUtils.convertString(arg)));
         }
     }
 
     private String resolveParamName(String annotationValue, String fallback) {
         return annotationValue.isBlank() ? fallback : annotationValue;
+    }
+
+    @Around("servicePointcut()")
+    public Object logAroundService(ProceedingJoinPoint joinPoint) throws Throwable {
+        String className  = joinPoint.getTarget().getClass().getSimpleName();
+        String methodName = joinPoint.getSignature().getName();
+        String paramLog   = buildParamServiceLog(joinPoint);
+
+        log.info("[Service][Start] --> {}.{}(){}", className, methodName, paramLog);
+
+        try {
+            Object result  = joinPoint.proceed();
+            log.info("[Service][End] <-- {}", StringUtils.convertString(result));
+            return result;
+        } catch (Exception e) {
+            log.error("[Service][End] <-- ERROR {} | {}", e.getClass().getSimpleName(), e.getMessage());
+            throw e;
+        }
+    }
+
+    private String buildParamServiceLog(ProceedingJoinPoint joinPoint) {
+        Parameter[] parameters = ((MethodSignature) joinPoint.getSignature()).getMethod().getParameters();
+        Object[]    args       = joinPoint.getArgs();
+        StringBuilder sb       = new StringBuilder();
+
+        for (int i = 0; i < parameters.length; i++) {
+            sb.append(String.format("%n [%s] = %s", parameters[i].getName(), StringUtils.convertString(args[i])));
+        }
+        return sb.toString();
     }
 }

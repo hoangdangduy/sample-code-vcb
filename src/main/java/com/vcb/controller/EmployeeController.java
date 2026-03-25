@@ -19,7 +19,7 @@ public class EmployeeController {
     @GetMapping("/profile")
     @PreAuthorize("hasAnyRole('EMPLOYEE', 'ADMIN')")
     public ResponseEntity<EmployeeResponse> getProfile(@AuthenticationPrincipal Jwt jwt) {
-        return ResponseEntity.ok(employeeService.getEmployeeByCode(getClaimSafe(jwt)));
+        return ResponseEntity.ok(employeeService.getEmployeeByUsername(getClaimSafe(jwt)));
     }
 
     private String getClaimSafe(Jwt jwt) {

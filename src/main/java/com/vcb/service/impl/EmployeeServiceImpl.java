@@ -29,7 +29,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeResponse getEmployeeByCode(String code) {
+    public EmployeeResponse getEmployeeByUsername(String code) {
         return employeeMapper.toResponse(employeeRepository.findEmployeeByUsername(code)
                 .orElseThrow(() -> new EmployeeNotFound(code)));
     }
@@ -49,14 +49,14 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     @Transactional
-    public void deleteEmployeeBy(String code) {
-        if (!employeeRepository.existsByUsername(code)) {
-            throw new EmployeeNotFound(code);
+    public void deleteEmployeeBy(String username) {
+        if (!employeeRepository.existsByUsername(username)) {
+            throw new EmployeeNotFound(username);
         }
         try {
-            employeeRepository.deleteByUsername(code);
+            employeeRepository.deleteByUsername(username);
         } catch (Exception e) {
-            log.error("Unexpected error when deleting employee {}: {}", code, e.getMessage());
+            log.error("Unexpected error when deleting employee {}: {}", username, e.getMessage());
             throw new EmployeeSaveException(ErrorCode.EMPLOYEE_DELETE_FAILED);
         }
     }

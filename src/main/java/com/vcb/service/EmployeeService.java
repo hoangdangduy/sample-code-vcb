@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface EmployeeService {
     List<EmployeeResponse> getAllEmployees();
-    EmployeeResponse getEmployeeByCode(String username);
+    EmployeeResponse getEmployeeByUsername(String username);
     void addEmployee(EmployeeRequest dto);
     void deleteEmployeeBy(String username);
 }
