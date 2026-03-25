@@ -10,5 +10,5 @@
       | jq -r '.access_token')
 
     # Gọi API xóa nhân viên theo username
-    curl -s -X DELETE "http://localhost:8080/api/admin/test" \
+    curl -s -X DELETE "http://localhost:8080/api/admin/test2" \
       -H "Authorization: Bearer $TOKEN"
