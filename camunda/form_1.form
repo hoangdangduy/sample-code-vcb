@@ -1,0 +1,33 @@
+{
+  "components": [
+    {
+      "label": "Mã đơn hàng",
+      "type": "textfield",
+      "layout": {
+        "row": "Row_1297rpy",
+        "columns": null
+      },
+      "id": "Field_0msh2it",
+      "key": "order"
+    },
+    {
+      "label": "Xác nhận đã đóng gói đủ sản phẩm",
+      "type": "checkbox",
+      "layout": {
+        "row": "Row_1dg1qa7",
+        "columns": null
+      },
+      "id": "Field_05h34dy",
+      "key": "inStock"
+    }
+  ],
+  "type": "default",
+  "id": "Form_0tufvz2",
+  "exporter": {
+    "name": "Camunda Modeler",
+    "version": "5.45.0"
+  },
+  "executionPlatform": "Camunda Platform",
+  "executionPlatformVersion": "7.24.0",
+  "schemaVersion": 19
+}

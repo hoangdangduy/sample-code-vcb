@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_0k0mypt" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.45.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.24.0">
+  <bpmn:process id="kiem_tra_ton_kho" name="Huỷ đơn do quá hạn" isExecutable="true" camunda:historyTimeToLive="30">
+    <bpmn:startEvent id="Event_02cvlq0">
+      <bpmn:outgoing>Flow_1q6kvha</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:serviceTask id="Activity_00bgj92" name="Kiểm tra tồn kho" camunda:type="external" camunda:topic="check-inventory">
+      <bpmn:incoming>Flow_1q6kvha</bpmn:incoming>
+      <bpmn:outgoing>Flow_1irqr6t</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_1q6kvha" sourceRef="Event_02cvlq0" targetRef="Activity_00bgj92" />
+    <bpmn:endEvent id="Event_1avpx0s" name="Đơn hàng thành công">
+      <bpmn:incoming>Flow_0r02ron</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:exclusiveGateway id="Gateway_0ad5y74">
+      <bpmn:incoming>Flow_1irqr6t</bpmn:incoming>
+      <bpmn:outgoing>Flow_1350gh2</bpmn:outgoing>
+      <bpmn:outgoing>Flow_095rvgh</bpmn:outgoing>
+    </bpmn:exclusiveGateway>
+    <bpmn:sequenceFlow id="Flow_1irqr6t" sourceRef="Activity_00bgj92" targetRef="Gateway_0ad5y74" />
+    <bpmn:endEvent id="Event_02twxxl" name="Huỷ đơn do hết hàng">
+      <bpmn:incoming>Flow_1350gh2</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1350gh2" sourceRef="Gateway_0ad5y74" targetRef="Event_02twxxl">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${!inStock}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:userTask id="Activity_0n1mw69" name="Đóng gói đơn hàng" camunda:formRef="Form_0tufvz2" camunda:formRefBinding="latest" camunda:assignee="demo">
+      <bpmn:incoming>Flow_095rvgh</bpmn:incoming>
+      <bpmn:outgoing>Flow_0r02ron</bpmn:outgoing>
+      <bpmn:outgoing>Flow_0x6dc2d</bpmn:outgoing>
+    </bpmn:userTask>
+    <bpmn:sequenceFlow id="Flow_095rvgh" sourceRef="Gateway_0ad5y74" targetRef="Activity_0n1mw69">
+      <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${inStock}</bpmn:conditionExpression>
+    </bpmn:sequenceFlow>
+    <bpmn:sequenceFlow id="Flow_0r02ron" sourceRef="Activity_0n1mw69" targetRef="Event_1avpx0s" />
+    <bpmn:endEvent id="Event_1hnxe6z">
+      <bpmn:incoming>Flow_0x6dc2d</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_0x6dc2d" sourceRef="Activity_0n1mw69" targetRef="Event_1hnxe6z" />
+    <bpmn:boundaryEvent id="Event_1ew4klh" attachedToRef="Activity_0n1mw69">
+      <bpmn:timerEventDefinition id="TimerEventDefinition_03m1dyk">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT5M</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:boundaryEvent>
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="kiem_tra_ton_kho">
+      <bpmndi:BPMNShape id="Event_02cvlq0_di" bpmnElement="Event_02cvlq0">
+        <dc:Bounds x="182" y="212" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1avpx0s_di" bpmnElement="Event_1avpx0s">
+        <dc:Bounds x="822" y="192" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="800" y="235" width="80" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0inl3u9_di" bpmnElement="Activity_00bgj92">
+        <dc:Bounds x="370" y="150" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0ad5y74_di" bpmnElement="Gateway_0ad5y74" isMarkerVisible="true">
+        <dc:Bounds x="565" y="165" width="50" height="50" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_02twxxl_di" bpmnElement="Event_02twxxl">
+        <dc:Bounds x="692" y="352" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="672" y="395" width="76" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0n1mw69_di" bpmnElement="Activity_0n1mw69">
+        <dc:Bounds x="660" y="80" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1hnxe6z_di" bpmnElement="Event_1hnxe6z">
+        <dc:Bounds x="1042" y="102" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0dao3kp_di" bpmnElement="Event_1ew4klh">
+        <dc:Bounds x="642" y="62" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_1q6kvha_di" bpmnElement="Flow_1q6kvha">
+        <di:waypoint x="218" y="230" />
+        <di:waypoint x="284" y="230" />
+        <di:waypoint x="284" y="190" />
+        <di:waypoint x="370" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1irqr6t_di" bpmnElement="Flow_1irqr6t">
+        <di:waypoint x="470" y="190" />
+        <di:waypoint x="565" y="190" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1350gh2_di" bpmnElement="Flow_1350gh2">
+        <di:waypoint x="590" y="215" />
+        <di:waypoint x="590" y="370" />
+        <di:waypoint x="692" y="370" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_095rvgh_di" bpmnElement="Flow_095rvgh">
+        <di:waypoint x="590" y="165" />
+        <di:waypoint x="590" y="120" />
+        <di:waypoint x="660" y="120" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0r02ron_di" bpmnElement="Flow_0r02ron">
+        <di:waypoint x="760" y="120" />
+        <di:waypoint x="791" y="120" />
+        <di:waypoint x="791" y="210" />
+        <di:waypoint x="822" y="210" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0x6dc2d_di" bpmnElement="Flow_0x6dc2d">
+        <di:waypoint x="760" y="120" />
+        <di:waypoint x="1042" y="120" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>
